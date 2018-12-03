@@ -26,6 +26,7 @@ class UrlTest extends AbstractTestCase
             ['http://www.innherred.no/kultur/2017/03/25/On-the-road-med-%C3%86-og-Hagen-14499028.ece', 'http://www.innherred.no/kultur/2017/03/25/On-the-road-med-%C3%86-og-Hagen-14499028.ece'],
             ['https://pbs.twimg.com/media/CvCZ90BXYAE5q80.png:large', 'https://pbs.twimg.com/media/CvCZ90BXYAE5q80.png:large'],
             ['http://img.bibo.kz/?7142389.jpg', 'http://img.bibo.kz/?7142389.jpg'],
+            ['https://twitter.com/search?q=google%2B&src=typd&lang=en', 'https://twitter.com/search?q=google%2B&src=typd&lang=en'],
         ];
     }
 
@@ -150,5 +151,26 @@ class UrlTest extends AbstractTestCase
     {
         $url = Url::create($url);
         $this->assertSame($expected, $url->match($pattern));
+    }
+
+    public function urlAbsoluteProvider()
+    {
+        return [
+            ['other-path', 'http://example.com/other-path'],
+            ['//other.com/path', 'http://other.com/path'],
+            ['data:base64', 'data:base64'],
+            ['', ''],
+            ['mailto:hello@example.com', 'mailto:hello@example.com'],
+        ];
+    }
+
+    /**
+     * @dataProvider urlAbsoluteProvider
+     */
+    public function testAbsoluteUrl($added, $expected)
+    {
+        $url = Url::create('http://example.com/path');
+
+        $this->assertSame($expected, $url->getAbsolute($added));
     }
 }
